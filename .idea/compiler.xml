@@ -8,6 +8,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="RabbitMQ Texts Editor" />
         <module name="RabbitMQ-Text-Editor" />
+        <module name="text-editor-2" />
       </profile>
     </annotationProcessing>
   </component>
