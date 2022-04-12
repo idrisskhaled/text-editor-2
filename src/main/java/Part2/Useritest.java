@@ -22,8 +22,11 @@ import java.util.concurrent.TimeoutException;
 public class Useritest extends JFrame implements ActionListener {
     static String[] QUEUE_NAMES1;
     static String[] QUEUE_NAMES2;
+    String bold = "N";
     JPanel[] panel;
     JPanel panel1;
+    JLabel lb;
+    String italic = "N";
     boolean accessible = false;
     JTextArea[] textAreas;
     JScrollPane[] scrollPanes;
@@ -43,7 +46,7 @@ public class Useritest extends JFrame implements ActionListener {
     private String message = "";
     private int nbUsers;
     private JSONObject message1;
-    private JSONObject message2;
+    private JSONObject message2[];
     private int userId = -1;
 
     Useritest() {
@@ -51,14 +54,7 @@ public class Useritest extends JFrame implements ActionListener {
         message1 = new JSONObject();
         message1.put("text", "");
         message1.put("free",1);
-        message2 = new JSONObject();
-        message2.put("fontSize", 20);
-        message2.put("fontFamily", "Arial");
-        message2.put("red", 0);
-        message2.put("green", 0);
-        message2.put("blue", 0);
-        message2.put("bold", 0);
-        message2.put("italic", 0);
+
         try {
             getNbUsers();
         } catch (IOException | TimeoutException ex) {
@@ -121,12 +117,23 @@ public class Useritest extends JFrame implements ActionListener {
         boldButtons = new JButton[nbUsers];
         italicButtons = new JButton[nbUsers];
         fontBoxs = new JComboBox[nbUsers];
+        message2 = new JSONObject[nbUsers];
+
         for (int j = 0; j < nbUsers; j++) {
+            message2[j]=new JSONObject();
+            message2[j].put("fontSize", 20);
+            message2[j].put("fontFamily", "Arial");
+            message2[j].put("red", 0);
+            message2[j].put("green", 0);
+            message2[j].put("blue", 0);
+            message2[j].put("bold", 0);
+            message2[j].put("italic", 0);
             QUEUE_NAMES1[j] = "text" + j;
             QUEUE_NAMES2[j] = "format" + j;
             fontColorButtons[j] = new JButton("Color");
             fontColorButtons[j].addActionListener(this);
             textAreas[j] = new JTextArea();
+
             textAreas[j].setLineWrap(true);
             textAreas[j].setWrapStyleWord(true);
             textAreas[j].setFont(new Font("Arial", Font.PLAIN, 20));
@@ -169,10 +176,10 @@ public class Useritest extends JFrame implements ActionListener {
             fontSizeSpinners[j].addChangeListener(new ChangeListener() {
                 @Override
                 public void stateChanged(ChangeEvent e) {
-                    textAreas[userId].setFont(new Font(textAreas[finalJ1].getFont().getFamily(), Font.PLAIN, (int) fontSizeSpinners[finalJ1].getValue()));
+                    textAreas[finalJ1].setFont(new Font(textAreas[finalJ1].getFont().getFamily(), Font.PLAIN, (int) fontSizeSpinners[finalJ1].getValue()));
                     try {
-                        message2.put("fontSize", Integer.toString((Integer) fontSizeSpinners[finalJ1].getValue()));
-                        EmitLog(message2, QUEUE_NAMES2[finalJ1]);
+                        message2[finalJ1].put("fontSize",fontSizeSpinners[finalJ1].getValue());
+                        EmitLog(message2[finalJ1], QUEUE_NAMES2[finalJ1]);
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
@@ -189,51 +196,32 @@ public class Useritest extends JFrame implements ActionListener {
             fontBoxs[j].setPreferredSize(new Dimension(160, 25));
 
             int finalJ = j;
-            textAreas[j].getDocument().addDocumentListener(new DocumentListener() {
-                @Override
-                public void insertUpdate(DocumentEvent e) {
-
-                        if((int)message1.get("free")==1 || (int)message1.get("userId")==userId)
-                        try {
-                        message1.put("free",0);
-                        message1.put("text", textAreas[finalJ].getText());
-                        message1.put("userId",userId);
-                        System.out.println(" ***  insertion ***" + finalJ);
-                        EmitLog(message1, QUEUE_NAMES1[finalJ]);
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-
-                }}
+            textAreas[j].addKeyListener(new KeyListener() {
 
                 @Override
-                public void removeUpdate(DocumentEvent e) {
-                    if((int)message1.get("free")==1 ||  (int)message1.get("userId")==userId){
-                        try {
-                        message1.put("free",0);
-                        message1.put("text", textAreas[finalJ].getText());
-                        message1.put("userId",userId);
-                            System.out.println(" ***  remove ***" + finalJ);
-                            EmitLog(message1, QUEUE_NAMES1[finalJ]);
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
-                }
+                public void keyTyped(KeyEvent arg0) {
+
                 }
 
                 @Override
-                public void changedUpdate(DocumentEvent e) {
-
+                public void keyReleased(KeyEvent arg0) {
                     if((int)message1.get("free")==1 || (int)message1.get("userId")==userId)
                         try {
-                        message1.put("free",0);
-                        message1.put("text", textAreas[finalJ].getText());
-                        message1.put("userId",userId);
-                            System.out.println(" ***  changing ***" + finalJ);
-                            EmitLog(message1, QUEUE_NAMES1[finalJ]);
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }}
+                            message1.put("free",0);
+                            message1.put("text", textAreas[finalJ].getText());
+                            message1.put("userId",userId);
+                            System.out.println("*** typed ***"+finalJ);
 
+                            EmitLog(message1, QUEUE_NAMES1[finalJ]);
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                        }
+                }
+
+                @Override
+                public void keyPressed(KeyEvent arg0) {
+
+                }
             });
 
             boldButtons[j] = new JButton("B");
@@ -273,43 +261,43 @@ public class Useritest extends JFrame implements ActionListener {
                 Color color = JColorChooser.showDialog(null, "Choose a color", Color.black);
                 textAreas[j].setForeground(color);
                 try {
-                    message2.put("red", color.getRed());
-                    message2.put("green", color.getGreen());
-                    message2.put("blue", color.getBlue());
-                    this.EmitLog(message2, QUEUE_NAMES2[j]);
+                    message2[j].put("red", color.getRed());
+                    message2[j].put("green", color.getGreen());
+                    message2[j].put("blue", color.getBlue());
+                    this.EmitLog(message2[j], QUEUE_NAMES2[j]);
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
                 textAreas[j].setForeground(color);
             }
             if (e.getSource() == boldButtons[j]) {
-                if ((int)message2.get("bold") == 0) {
-                    message2.put("bold", 1);
+                if ((int)message2[j].get("bold") == 0) {
+                    message2[j].put("bold", 1);
                     textAreas[j].setFont(new Font(textAreas[j].getFont().getFamily(), textAreas[j].getFont().getStyle() + 1, textAreas[j].getFont().getSize()));
 
                 } else {
-                    message2.put("bold", 0);
+                    message2[j].put("bold", 0);
                     textAreas[j].setFont(new Font(textAreas[j].getFont().getFamily(), textAreas[j].getFont().getStyle() - 1, textAreas[j].getFont().getSize()));
                 }
                 try {
-                    this.EmitLog(message2, QUEUE_NAMES2[j]);
+                    this.EmitLog(message2[j], QUEUE_NAMES2[j]);
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
             }
 
             if (e.getSource() == italicButtons[j]) {
-                if ((int)message2.get("bold") == 0) {
-                    message2.put("italic", 2);
+                if ((int)message2[j].get("italic") == 0) {
+                    message2[j].put("italic", 2);
                     textAreas[j].setFont(new Font(textAreas[j].getFont().getFamily(), textAreas[j].getFont().getStyle() + 2, textAreas[j].getFont().getSize()));
 
                 } else {
 
-                    message2.put("italic", 0);
+                    message2[j].put("italic", 0);
                     textAreas[j].setFont(new Font(textAreas[j].getFont().getFamily(), textAreas[j].getFont().getStyle() - 2, textAreas[j].getFont().getSize()));
                 }
                 try {
-                    this.EmitLog(message2, QUEUE_NAMES2[j]);
+                    this.EmitLog(message2[j], QUEUE_NAMES2[j]);
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
@@ -318,8 +306,8 @@ public class Useritest extends JFrame implements ActionListener {
             if (e.getSource() == fontBoxs[j]) {
                 textAreas[j].setFont(new Font((String) fontBoxs[j].getSelectedItem(), Font.PLAIN, textAreas[j].getFont().getSize()));
                 try {
-                    message2.put("fontFamily", fontBoxs[j].getSelectedItem());
-                    this.EmitLog(message2, QUEUE_NAMES2[j]);
+                    message2[j].put("fontFamily", fontBoxs[j].getSelectedItem());
+                    this.EmitLog(message2[j], QUEUE_NAMES2[j]);
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
@@ -331,9 +319,10 @@ public class Useritest extends JFrame implements ActionListener {
         }
         if (e.getSource() == submit) {
             userId = Integer.parseInt(this.field.getText());
-
             message1.put("userId", userId);
-            message2.put("userId", userId);
+            for(int j=0;j<nbUsers;j++){
+                message2[j].put("userId", userId);
+            }
             try {
                 startConnection();
             } catch (IOException | TimeoutException ex) {
@@ -360,6 +349,7 @@ public class Useritest extends JFrame implements ActionListener {
         channel.basicConsume(queueName, true, deliverCallback, consumerTag -> {
         });
     }
+
 
     public void EmitLog(JSONObject obj, String Queue_name) throws IOException {
         String message = obj.toString();
@@ -402,14 +392,23 @@ public class Useritest extends JFrame implements ActionListener {
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                if (Math.toIntExact((Long)json.get("userId"))!= userId){
+                if (Math.toIntExact((Long)json.get("userId")) != userId) {
                     message1.put("userId",Math.toIntExact((Long)json.get("userId")));
                     message1.put("text", json.get("text"));
                     message1.put("free",Math.toIntExact((Long)json.get("free")));
                     textAreas[finalI].setText((String) json.get("text"));
+                    if((int)message1.get("free")==1){
+                        textAreas[finalI].setEditable(true);
+                        textAreas[finalI].setFocusable(true);
 
+                    }
+                    else {
+                        textAreas[finalI].setEditable(false);
+                        textAreas[finalI].setFocusable(false);
+
+                    }
                 }
-              //  this.EmitLog(json, queueNames1[finalI]);
+                //    this.EmitLog(json, queueNames1[finalI]);
 
             };
             channel.basicConsume(queueNames1[i], true, deliverCallback, consumerTag -> {
@@ -424,16 +423,22 @@ public class Useritest extends JFrame implements ActionListener {
                     e.printStackTrace();
                 }
                 if (Math.toIntExact((Long)json.get("userId")) != userId) {
-
                     System.out.println(" [x] Received '" + delivery.getEnvelope().getRoutingKey() + "':'" + message + "'");
                     textAreas[finalI].setForeground(new Color(Math.toIntExact((Long)json.get("red")), Math.toIntExact((Long)json.get("green")), Math.toIntExact((Long) json.get("blue"))));
                     textAreas[finalI].setFont(new Font((String) json.get("fontFamily"), Math.toIntExact((Long)json.get("bold"))+ Math.toIntExact((Long)json.get("italic")),Math.toIntExact((Long)json.get("fontSize"))));
-                    message2 = json;
+                    message2[finalI].put("red", Math.toIntExact((Long)json.get("red")));
+                    message2[finalI].put("green",Math.toIntExact((Long) json.get("green")));
+                    message2[finalI].put("blue",Math.toIntExact((Long) json.get("blue")));
+                    message2[finalI].put("italic", Math.toIntExact((Long)json.get("italic")));
+                    message2[finalI].put("bold", Math.toIntExact((Long)json.get("bold")));
+                    message2[finalI].put("fontFamily",json.get("fontFamily"));
+                    message2[finalI].put("fontSize", Math.toIntExact((Long)json.get("fontSize")));
+
                 }
             };
             channel.basicConsume(queueNames2[i], true, deliverCallback2, consumerTag -> {
             });
-            this.EmitLog(message2, QUEUE_NAMES2[i]);
+            //this.EmitLog(message2, QUEUE_NAMES2[i]);
         }
     }
 }
