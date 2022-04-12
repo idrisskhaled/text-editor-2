@@ -19,14 +19,11 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeoutException;
 
-public class Useri extends JFrame implements ActionListener {
+public class Useritest extends JFrame implements ActionListener {
     static String[] QUEUE_NAMES1;
     static String[] QUEUE_NAMES2;
-    String bold = "N";
     JPanel[] panel;
     JPanel panel1;
-    JLabel lb;
-    String italic = "N";
     boolean accessible = false;
     JTextArea[] textAreas;
     JScrollPane[] scrollPanes;
@@ -49,7 +46,7 @@ public class Useri extends JFrame implements ActionListener {
     private JSONObject message2;
     private int userId = -1;
 
-    Useri() {
+    Useritest() {
         System.out.println("constructeur");
         message1 = new JSONObject();
         message1.put("text", "");
@@ -62,7 +59,6 @@ public class Useri extends JFrame implements ActionListener {
         message2.put("blue", 0);
         message2.put("bold", 0);
         message2.put("italic", 0);
-
         try {
             getNbUsers();
         } catch (IOException | TimeoutException ex) {
@@ -109,7 +105,7 @@ public class Useri extends JFrame implements ActionListener {
 
     public static void main(String[] args) {
 
-        new Useri();
+        new Useritest();
 
     }
 
@@ -131,7 +127,6 @@ public class Useri extends JFrame implements ActionListener {
             fontColorButtons[j] = new JButton("Color");
             fontColorButtons[j].addActionListener(this);
             textAreas[j] = new JTextArea();
-
             textAreas[j].setLineWrap(true);
             textAreas[j].setWrapStyleWord(true);
             textAreas[j].setFont(new Font("Arial", Font.PLAIN, 20));
@@ -159,7 +154,7 @@ public class Useri extends JFrame implements ActionListener {
                                                       ex.printStackTrace();
                                                   }
                                               }
-            }
+                                          }
             );
             scrollPanes[j] = new JScrollPane(textAreas[j]);
             scrollPanes[j].setPreferredSize(new Dimension(450, 200));
@@ -197,45 +192,44 @@ public class Useri extends JFrame implements ActionListener {
             textAreas[j].getDocument().addDocumentListener(new DocumentListener() {
                 @Override
                 public void insertUpdate(DocumentEvent e) {
-                    if((int)message1.get("free")==1 || (int)message1.get("userId")==userId)
-                    try {
+
+                        if((int)message1.get("free")==1 || (int)message1.get("userId")==userId)
+                        try {
                         message1.put("free",0);
                         message1.put("text", textAreas[finalJ].getText());
                         message1.put("userId",userId);
-                        System.out.println("*** insertion ***"+finalJ);
-
+                        System.out.println(" ***  insertion ***" + finalJ);
                         EmitLog(message1, QUEUE_NAMES1[finalJ]);
                     } catch (IOException ex) {
                         ex.printStackTrace();
-                    }
 
-                }
+                }}
 
                 @Override
                 public void removeUpdate(DocumentEvent e) {
-                    if((int)message1.get("free")==1 || (int)message1.get("userId")==userId)
-                    try {
+                    if((int)message1.get("free")==1 ||  (int)message1.get("userId")==userId){
+                        try {
                         message1.put("free",0);
                         message1.put("text", textAreas[finalJ].getText());
                         message1.put("userId",userId);
-                        System.out.println("*** remove ***"+finalJ);
-
-                        EmitLog(message1, QUEUE_NAMES1[finalJ]);
+                            System.out.println(" ***  remove ***" + finalJ);
+                            EmitLog(message1, QUEUE_NAMES1[finalJ]);
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
+                }
                 }
 
                 @Override
                 public void changedUpdate(DocumentEvent e) {
+
                     if((int)message1.get("free")==1 || (int)message1.get("userId")==userId)
-                    try {
+                        try {
                         message1.put("free",0);
                         message1.put("text", textAreas[finalJ].getText());
                         message1.put("userId",userId);
-                        System.out.println("*** change ***"+finalJ);
-
-                        EmitLog(message1, QUEUE_NAMES1[finalJ]);
+                            System.out.println(" ***  changing ***" + finalJ);
+                            EmitLog(message1, QUEUE_NAMES1[finalJ]);
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }}
@@ -337,6 +331,7 @@ public class Useri extends JFrame implements ActionListener {
         }
         if (e.getSource() == submit) {
             userId = Integer.parseInt(this.field.getText());
+
             message1.put("userId", userId);
             message2.put("userId", userId);
             try {
@@ -365,7 +360,6 @@ public class Useri extends JFrame implements ActionListener {
         channel.basicConsume(queueName, true, deliverCallback, consumerTag -> {
         });
     }
-
 
     public void EmitLog(JSONObject obj, String Queue_name) throws IOException {
         String message = obj.toString();
@@ -408,14 +402,14 @@ public class Useri extends JFrame implements ActionListener {
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                if (Math.toIntExact((Long)json.get("userId")) != userId) {
+                if (Math.toIntExact((Long)json.get("userId"))!= userId){
                     message1.put("userId",Math.toIntExact((Long)json.get("userId")));
                     message1.put("text", json.get("text"));
                     message1.put("free",Math.toIntExact((Long)json.get("free")));
                     textAreas[finalI].setText((String) json.get("text"));
 
                 }
-            //    this.EmitLog(json, queueNames1[finalI]);
+              //  this.EmitLog(json, queueNames1[finalI]);
 
             };
             channel.basicConsume(queueNames1[i], true, deliverCallback, consumerTag -> {
@@ -430,6 +424,7 @@ public class Useri extends JFrame implements ActionListener {
                     e.printStackTrace();
                 }
                 if (Math.toIntExact((Long)json.get("userId")) != userId) {
+
                     System.out.println(" [x] Received '" + delivery.getEnvelope().getRoutingKey() + "':'" + message + "'");
                     textAreas[finalI].setForeground(new Color(Math.toIntExact((Long)json.get("red")), Math.toIntExact((Long)json.get("green")), Math.toIntExact((Long) json.get("blue"))));
                     textAreas[finalI].setFont(new Font((String) json.get("fontFamily"), Math.toIntExact((Long)json.get("bold"))+ Math.toIntExact((Long)json.get("italic")),Math.toIntExact((Long)json.get("fontSize"))));
