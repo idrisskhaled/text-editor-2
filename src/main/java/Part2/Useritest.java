@@ -176,7 +176,7 @@ public class Useritest extends JFrame implements ActionListener {
             fontSizeSpinners[j].addChangeListener(new ChangeListener() {
                 @Override
                 public void stateChanged(ChangeEvent e) {
-                    textAreas[finalJ1].setFont(new Font(textAreas[finalJ1].getFont().getFamily(), Font.PLAIN, (int) fontSizeSpinners[finalJ1].getValue()));
+                    textAreas[finalJ1].setFont(new Font(textAreas[finalJ1].getFont().getFamily(), textAreas[finalJ1].getFont().getStyle(), (int) fontSizeSpinners[finalJ1].getValue()));
                     try {
                         message2[finalJ1].put("fontSize",fontSizeSpinners[finalJ1].getValue());
                         EmitLog(message2[finalJ1], QUEUE_NAMES2[finalJ1]);
@@ -210,8 +210,6 @@ public class Useritest extends JFrame implements ActionListener {
                             message1.put("free",0);
                             message1.put("text", textAreas[finalJ].getText());
                             message1.put("userId",userId);
-                            System.out.println("*** typed ***"+finalJ);
-
                             EmitLog(message1, QUEUE_NAMES1[finalJ]);
                         } catch (IOException ex) {
                             ex.printStackTrace();
@@ -304,7 +302,7 @@ public class Useritest extends JFrame implements ActionListener {
             }
 
             if (e.getSource() == fontBoxs[j]) {
-                textAreas[j].setFont(new Font((String) fontBoxs[j].getSelectedItem(), Font.PLAIN, textAreas[j].getFont().getSize()));
+                textAreas[j].setFont(new Font((String) fontBoxs[j].getSelectedItem(), textAreas[j].getFont().getStyle(), textAreas[j].getFont().getSize()));
                 try {
                     message2[j].put("fontFamily", fontBoxs[j].getSelectedItem());
                     this.EmitLog(message2[j], QUEUE_NAMES2[j]);

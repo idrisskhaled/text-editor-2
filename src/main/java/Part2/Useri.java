@@ -176,7 +176,7 @@ public class Useri extends JFrame implements ActionListener {
             fontSizeSpinners[j].addChangeListener(new ChangeListener() {
                 @Override
                 public void stateChanged(ChangeEvent e) {
-                    textAreas[finalJ1].setFont(new Font(textAreas[finalJ1].getFont().getFamily(), Font.PLAIN, (int) fontSizeSpinners[finalJ1].getValue()));
+                    textAreas[finalJ1].setFont(new Font(textAreas[finalJ1].getFont().getFamily(), textAreas[finalJ1].getFont().getStyle(), (int) fontSizeSpinners[finalJ1].getValue()));
                     try {
                         message2[finalJ1].put("fontSize",fontSizeSpinners[finalJ1].getValue());
                         EmitLog(message2[finalJ1], QUEUE_NAMES2[finalJ1]);
@@ -274,7 +274,7 @@ public class Useri extends JFrame implements ActionListener {
                 if ((int)message2[j].get("bold") == 0) {
                     message2[j].put("bold", 1);
                     textAreas[j].setFont(new Font(textAreas[j].getFont().getFamily(), textAreas[j].getFont().getStyle() + 1, textAreas[j].getFont().getSize()));
-
+                    boldButtons[j].setBackground(new Color(220,220,220));
                 } else {
                     message2[j].put("bold", 0);
                     textAreas[j].setFont(new Font(textAreas[j].getFont().getFamily(), textAreas[j].getFont().getStyle() - 1, textAreas[j].getFont().getSize()));
@@ -285,14 +285,11 @@ public class Useri extends JFrame implements ActionListener {
                     ex.printStackTrace();
                 }
             }
-
             if (e.getSource() == italicButtons[j]) {
                 if ((int)message2[j].get("italic") == 0) {
                     message2[j].put("italic", 2);
                     textAreas[j].setFont(new Font(textAreas[j].getFont().getFamily(), textAreas[j].getFont().getStyle() + 2, textAreas[j].getFont().getSize()));
-
                 } else {
-
                     message2[j].put("italic", 0);
                     textAreas[j].setFont(new Font(textAreas[j].getFont().getFamily(), textAreas[j].getFont().getStyle() - 2, textAreas[j].getFont().getSize()));
                 }
@@ -302,9 +299,8 @@ public class Useri extends JFrame implements ActionListener {
                     ex.printStackTrace();
                 }
             }
-
             if (e.getSource() == fontBoxs[j]) {
-                textAreas[j].setFont(new Font((String) fontBoxs[j].getSelectedItem(), Font.PLAIN, textAreas[j].getFont().getSize()));
+                textAreas[j].setFont(new Font((String) fontBoxs[j].getSelectedItem(), textAreas[j].getFont().getStyle(), textAreas[j].getFont().getSize()));
                 try {
                     message2[j].put("fontFamily", fontBoxs[j].getSelectedItem());
                     this.EmitLog(message2[j], QUEUE_NAMES2[j]);
@@ -313,7 +309,6 @@ public class Useri extends JFrame implements ActionListener {
                 }
             }
         }
-
         if (e.getSource() == exitItem) {
             System.exit(0);
         }
@@ -400,12 +395,10 @@ public class Useri extends JFrame implements ActionListener {
                     if((int)message1.get("free")==1){
                         textAreas[finalI].setEditable(true);
                         textAreas[finalI].setFocusable(true);
-
                     }
                     else {
                         textAreas[finalI].setEditable(false);
                         textAreas[finalI].setFocusable(false);
-
                     }
                 }
             //    this.EmitLog(json, queueNames1[finalI]);
