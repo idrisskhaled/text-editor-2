@@ -45,15 +45,12 @@ public class Useri extends JFrame implements ActionListener {
     JLabel result;
     private String message = "";
     private int nbUsers;
-    private JSONObject message1;
+    private JSONObject message1[];
     private JSONObject message2[];
     private int userId = -1;
 
     Useri() {
         System.out.println("constructeur");
-        message1 = new JSONObject();
-        message1.put("text", "");
-        message1.put("free",1);
 
         try {
             getNbUsers();
@@ -119,7 +116,12 @@ public class Useri extends JFrame implements ActionListener {
         fontBoxs = new JComboBox[nbUsers];
         message2 = new JSONObject[nbUsers];
 
+        message1 = new JSONObject[nbUsers];
+
         for (int j = 0; j < nbUsers; j++) {
+            message1[j]=new JSONObject();
+            message1[j].put("text", "");
+            message1[j].put("free",1);
             message2[j]=new JSONObject();
             message2[j].put("fontSize", 20);
             message2[j].put("fontFamily", "Arial");
@@ -141,22 +143,22 @@ public class Useri extends JFrame implements ActionListener {
             textAreas[j].addFocusListener(new FocusListener() {
                                               @Override
                                               public void focusGained(FocusEvent e) {
-                                                  message1.put("free", 0);
-                                                  message1.put("userId",userId);
-                                                  message1.put("text",textAreas[finalJ2].getText());
+                                                  message1[finalJ2].put("free", 0);
+                                                  message1[finalJ2].put("userId",userId);
+                                                  message1[finalJ2].put("text",textAreas[finalJ2].getText());
                                                   try {
-                                                      EmitLog(message1,"text"+finalJ2);
+                                                      EmitLog(message1[finalJ2],"text"+finalJ2);
                                                   } catch (IOException ex) {
                                                       ex.printStackTrace();
                                                   }
                                               }
                                               @Override
                                               public void focusLost(FocusEvent e) {
-                                                  message1.put("free", 1);
-                                                  message1.put("userId",userId);
-                                                  message1.put("text",textAreas[finalJ2].getText());
+                                                  message1[finalJ2].put("free", 1);
+                                                  message1[finalJ2].put("userId",userId);
+                                                  message1[finalJ2].put("text",textAreas[finalJ2].getText());
                                                   try {
-                                                      EmitLog(message1,"text"+finalJ2);
+                                                      EmitLog(message1[finalJ2],"text"+finalJ2);
                                                   } catch (IOException ex) {
                                                       ex.printStackTrace();
                                                   }
@@ -205,14 +207,14 @@ public class Useri extends JFrame implements ActionListener {
 
                 @Override
                 public void keyReleased(KeyEvent arg0) {
-                    if((int)message1.get("free")==1 || (int)message1.get("userId")==userId)
+                    if((int)message1[finalJ].get("free")==1 || (int)message1[finalJ].get("userId")==userId)
                         try {
-                            message1.put("free",0);
-                            message1.put("text", textAreas[finalJ].getText());
-                            message1.put("userId",userId);
+                            message1[finalJ].put("free",0);
+                            message1[finalJ].put("text", textAreas[finalJ].getText());
+                            message1[finalJ].put("userId",userId);
                             System.out.println("*** typed ***"+finalJ);
 
-                            EmitLog(message1, QUEUE_NAMES1[finalJ]);
+                            EmitLog(message1[finalJ], QUEUE_NAMES1[finalJ]);
                         } catch (IOException ex) {
                             ex.printStackTrace();
                         }
@@ -314,8 +316,8 @@ public class Useri extends JFrame implements ActionListener {
         }
         if (e.getSource() == submit) {
             userId = Integer.parseInt(this.field.getText());
-            message1.put("userId", userId);
             for(int j=0;j<nbUsers;j++){
+                message1[j].put("userId", userId);
                 message2[j].put("userId", userId);
             }
             try {
@@ -328,7 +330,10 @@ public class Useri extends JFrame implements ActionListener {
 
     public void getNbUsers() throws IOException, TimeoutException {
         ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost("localhost");
+        factory.setHost("192.168.43.92");
+        factory.setUsername("idriss");
+        factory.setPassword("idriss");
+        factory.setPort(5672);
         Connection connection = factory.newConnection();
         Channel channel = connection.createChannel();
         channel.exchangeDeclare("exchange", "direct", true);
@@ -349,7 +354,10 @@ public class Useri extends JFrame implements ActionListener {
     public void EmitLog(JSONObject obj, String Queue_name) throws IOException {
         String message = obj.toString();
         ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost("localhost");
+        factory.setHost("192.168.43.92");
+        factory.setUsername("idriss");
+        factory.setPassword("idriss");
+        factory.setPort(5672);
         try (Connection connection = factory.newConnection();
              Channel channel = connection.createChannel()) {
             channel.exchangeDeclare("exchange", "direct", true);
@@ -364,7 +372,10 @@ public class Useri extends JFrame implements ActionListener {
 
     public void startConnection() throws IOException, TimeoutException {
         ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost("localhost");
+        factory.setHost("192.168.43.92");
+        factory.setUsername("idriss");
+        factory.setPassword("idriss");
+        factory.setPort(5672);
         Connection connection = factory.newConnection();
         Channel channel = connection.createChannel();
         channel.exchangeDeclare("exchange", "direct", true);
@@ -388,11 +399,11 @@ public class Useri extends JFrame implements ActionListener {
                     e.printStackTrace();
                 }
                 if (Math.toIntExact((Long)json.get("userId")) != userId) {
-                    message1.put("userId",Math.toIntExact((Long)json.get("userId")));
-                    message1.put("text", json.get("text"));
-                    message1.put("free",Math.toIntExact((Long)json.get("free")));
+                    message1[finalI].put("userId",Math.toIntExact((Long)json.get("userId")));
+                    message1[finalI].put("text", json.get("text"));
+                    message1[finalI].put("free",Math.toIntExact((Long)json.get("free")));
                     textAreas[finalI].setText((String) json.get("text"));
-                    if((int)message1.get("free")==1){
+                    if((int)message1[finalI].get("free")==1){
                         textAreas[finalI].setEditable(true);
                         textAreas[finalI].setFocusable(true);
                     }

@@ -44,7 +44,10 @@ public class Config extends JFrame implements ActionListener {
 
     public void EmitLog(String message)  {
         ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost("localhost");
+        factory.setHost("192.168.43.92");
+        factory.setUsername("idriss");
+        factory.setPassword("idriss");
+        factory.setPort(5672);
         try (Connection connection = factory.newConnection();
              Channel channel = connection.createChannel()) {
             channel.exchangeDeclare("exchange","direct",true);
@@ -69,7 +72,6 @@ public class Config extends JFrame implements ActionListener {
         catch (Exception x){
             result.setText("Error : Invalid input");
             result.setForeground(Color.red);
-
             result.setVisible(true);
             x.printStackTrace();
         }
